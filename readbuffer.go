@@ -56,6 +56,7 @@ func (r *readBuffer) Offer(reader io.Reader) error {
 	}
 
 	if r.buf.Len() > MaxBuffer {
+		fmt.Println("PAUSING")
 		r.backPressure.Pause()
 	}
 
@@ -83,6 +84,7 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 			r.cond.Broadcast()
 			if r.buf.Len() < MaxBuffer/8 {
 				r.backPressure.Resume()
+				fmt.Println("RESUMING")
 			}
 			return n, nil
 		}
