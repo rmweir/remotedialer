@@ -78,6 +78,7 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 				// The definition of bytes.Buffer is that this will always return nil because
 				// we first checked that bytes.Buffer.Len() > 0. We assume that fact so just assert
 				// that here.
+				fmt.Println("ERR 1", err.Error())
 				panic("bytes.Buffer returned err=\"" + err.Error() + "\" when buffer length was > 0")
 			}
 			r.readCount += int64(n)
@@ -90,12 +91,14 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 		}
 
 		if r.err != nil {
+			fmt.Println("ERR 2", r.err.Error())
 			return 0, r.err
 		}
 
 		now := time.Now()
 		if !r.deadline.IsZero() {
 			if now.After(r.deadline) {
+				fmt.Println("ERR 3 deadline exceeded")
 				return 0, errors.New("deadline exceeded")
 			}
 		}
@@ -115,6 +118,7 @@ func (r *readBuffer) Close(err error) error {
 	r.cond.L.Lock()
 	defer r.cond.L.Unlock()
 	if r.err == nil {
+		fmt.Println("ERR 4", r.err.Error())
 		r.err = err
 	}
 	r.cond.Broadcast()
